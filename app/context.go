@@ -81,6 +81,24 @@ func (c *Context) Load() {
 			Correct:    rl.Color{R: 26, G: 214, B: 118, A: 255},
 			Highlight:  rl.White,
 		},
+		{
+			Name:       "Yellow Dark",
+			Background: rl.Color{R: 17, G: 17, B: 17, A: 255},
+			Text:       rl.Color{R: 192, G: 166, B: 116, A: 255},
+			Cursor:     rl.Color{R: 225, G: 225, B: 225, A: 255},
+			Wrong:      rl.Color{R: 218, G: 51, B: 51, A: 255},
+			Correct:    rl.Color{R: 225, G: 225, B: 225, A: 255},
+			Highlight:  rl.Color{R: 225, G: 225, B: 225, A: 255},
+		},
+		{
+			Name:       "Naysayer",
+			Background: rl.Color{R: 6, G: 38, B: 37, A: 255},     // #062625
+			Text:       rl.Color{R: 208, G: 184, B: 146, A: 255}, // #d0b892
+			Cursor:     rl.Color{R: 255, G: 255, B: 255, A: 255}, // #ffffff
+			Wrong:      rl.Color{R: 255, G: 0, B: 0, A: 255},     // #ff0000
+			Correct:    rl.Color{R: 255, G: 255, B: 255, A: 255}, // #A6E22E (зелёный из палитры)
+			Highlight:  rl.Color{R: 11, G: 51, B: 53, A: 255},    // #0b3335 (фон подсветки/hl)
+		},
 	}
 
 	// Load fonts
