@@ -3,6 +3,7 @@ package app
 import (
 	"TouchTyper/config"
 	"bufio"
+	"encoding/gob"
 	"os"
 	"path/filepath"
 	"strings"
@@ -129,16 +130,19 @@ func (c *Context) Load() {
 		c.Sounds.ClickSound1 = rl.LoadSound(soundPath)
 	}
 
-	// Initialize settings with defaults
-	c.SelectedTheme = 0
-	c.SelectedWordList = 0
-	c.TestSettings = config.TestSettings{
-		TestModeAmounts: []int{15, 30, 60, 120},
-		SelectedAmount:  1,
-		TestMode:        config.TEST_MODE_TIME,
+	err := c.loadSettings()
+	if err != nil {
+		// Initialize settings with defaults
+		c.SelectedTheme = 0
+		c.SelectedWordList = 0
+		c.TestSettings = config.TestSettings{
+			TestModeAmounts: []int{15, 30, 60, 120},
+			SelectedAmount:  1,
+			TestMode:        config.TEST_MODE_TIME,
+		}
+		c.CursorStyle = config.CURSOR_BLOCK
+		c.SoundOn = true
 	}
-	c.CursorStyle = config.CURSOR_BLOCK
-	c.SoundOn = true
 }
 
 func (c *Context) loadWordLists(basePath string) {
@@ -207,14 +211,64 @@ func (c *Context) loadWordsFromFile(filename string) []string {
 	return words
 }
 
-func (c *Context) SaveSettings() {
-	// TODO
+func (c *Context) saveSettings() error {
+	file, err := os.Create("config.data")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	data := c.toSaveData()
+
+	encoder := gob.NewEncoder(file)
+	return encoder.Encode(data)
 }
 
-func (c *Context) Unload() {
+func (c *Context) loadSettings() error {
+	file, err := os.Open("config.data")
+	if err != nil {
+		return err
+	}
+
+	data := saveData{}
+
+	decoder := gob.NewDecoder(file)
+	err = decoder.Decode(&data)
+	if err != nil {
+		return err
+	}
+
+	c.fromSaveData(data)
+	return nil
+}
+
+func (c *Context) toSaveData() saveData {
+	return saveData{
+		c.SelectedTheme,
+		c.SelectedWordList,
+		c.TestSettings,
+		c.CursorStyle,
+		c.SoundOn,
+	}
+}
+
+func (c *Context) fromSaveData(s saveData) {
+	c.SelectedTheme = s.SelectedTheme
+	c.SelectedWordList = s.SelectedWordList
+	c.TestSettings = s.TestSettings
+	c.CursorStyle = s.CursorStyle
+	c.SoundOn = s.SoundOn
+}
+
+func (c *Context) Unload() error {
+	var err error
+	err = c.saveSettings()
+
 	rl.UnloadFont(c.Fonts.TypingTestFont.Font)
 	rl.UnloadFont(c.Fonts.TitleFont.Font)
 	rl.UnloadFont(c.Fonts.TinyFont.Font)
 	rl.UnloadFont(c.Fonts.BigFont.Font)
 	rl.UnloadSound(c.Sounds.ClickSound1)
+
+	return err
 }

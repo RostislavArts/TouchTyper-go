@@ -3,6 +3,7 @@ package main
 import (
 	"TouchTyper/app"
 	"TouchTyper/config"
+	"log"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -18,7 +19,12 @@ func main() {
 
 	context := app.NewContext()
 	context.Load()
-	defer context.Unload()
+	defer func() {
+		err := context.Unload()
+		if err != nil {
+			log.Printf("Error saving user data! Details: %s", err)
+		}
+	}()
 
 	app.RestartTest(context, false)
 

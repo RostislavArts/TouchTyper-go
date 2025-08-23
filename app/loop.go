@@ -57,9 +57,5 @@ func Loop(context *Context) {
 
 	footer(context)
 
-	if rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
-		context.SaveSettings()
-	}
-
 	rl.EndDrawing()
 }
